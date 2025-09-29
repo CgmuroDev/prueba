@@ -1,0 +1,40 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="purchase_request_pivot_view">
+            <field name="name">purchase.request.pivot</field>
+            <field name="model">purchase.request</field>
+            <field name="arch" type="xml">
+                <pivot string="Análisis de Solicitudes de Compra">
+                    <field name="department_id" type="row"/>
+                    <field name="state" type="col"/>
+                    <field name="total_amount" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="purchase_request_graph_view">
+            <field name="name">purchase.request.graph</field>
+            <field name="model">purchase.request</field>
+            <field name="arch" type="xml">
+                <graph string="Análisis de Solicitudes de Compra">
+                    <field name="state" type="row"/>
+                    <field name="department_id" type="col"/>
+                    <field name="total_amount" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="purchase_request_dashboard_action">
+            <field name="name">Análisis de Solicitudes</field>
+            <field name="res_model">purchase.request</field>
+            <field name="view_mode">graph,pivot</field>
+            <field name="context">{}</field>
+        </record>
+
+        <menuitem id="purchase_request_dashboard_menu"
+                  name="Análisis de Solicitudes"
+                  parent="purchase_request_menu_root"
+                  action="purchase_request_dashboard_action"
+                  sequence="20"/>
+    </data>
+</odoo>

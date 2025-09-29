@@ -1,0 +1,198 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="purchase_request_tree_view">
+            <field name="name">purchase.request.tree</field>
+            <field name="model">purchase.request</field>
+            <field name="arch" type="xml">
+                <tree decoration-danger="state == 'rejected' or state == 'cancel'"
+                      decoration-success="state == 'approved' or state == 'po_created'"
+                      decoration-warning="state == 'to_approve'"
+                      decoration-info="state == 'draft'">
+                    <field name="name"/>
+                    <field name="requester_id"/>
+                    <field name="date_needed"/>
+                    <field name="state" widget="badge"/>
+                    <field name="priority" widget="priority"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="purchase_request_form_view">
+            <field name="name">purchase.request.form</field>
+            <field name="model">purchase.request</field>
+            <field name="arch" type="xml">
+                <form string="Solicitud de Compra">
+                    <header>
+                        <button name="action_submit_for_approval"
+                                string="Enviar a Aprobación"
+                                type="object"
+                                class="oe_highlight"
+                                invisible="state != 'draft'"/>
+
+                        <button name="action_approve"
+                                string="Aprobar"
+                                type="object"
+                                class="oe_highlight"
+                                invisible="state != 'to_approve'"
+                                groups="purchase_request.group_purchase_request_manager"/>
+
+                        <button name="action_create_purchase_order"
+                                string="Crear Órdenes de Compra"
+                                type="object"
+                                class="oe_highlight"
+                                invisible="state != 'approved'"/>
+
+                        <button name="action_reject"
+                                string="Rechazar"
+                                type="object"
+                                class="btn-danger"
+                                invisible="state != 'to_approve'"/>
+
+                        <button name="action_cancel"
+                                string="Cancelar"
+                                type="object"
+                                invisible="state == 'cancel' or state in ['rejected', 'po_created']"/>
+
+                        <button name="action_reset_to_draft"
+                                string="Restablecer a Borrador"
+                                type="object"
+                                invisible="not (state in ['cancel', 'rejected'])"/>
+
+
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,to_approve,approved,po_created"/>
+                    </header>
+
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_purchase_orders"
+                                    type="object"
+                                    class="oe_stat_button"
+                                    icon="fa-shopping-cart"
+                                    invisible="purchase_order_count == 0">
+                                <field name="purchase_order_count" widget="statinfo" string="Órdenes"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="requester_id"/>
+                                <field name="department_id"/>
+                            </group>
+                            <group>
+                                <field name="date_needed"/>
+                                <field name="priority" widget="priority"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Productos/Servicios">
+                                <field name="line_ids">
+                                    <tree editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="estimated_price"/>
+                                        <field name="suggested_vendor_id"/>
+                                        <field name="taxes_id" widget="many2many_tags"/>
+                                        <field name="subtotal" sum="total"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Justificación">
+                                <field name="justification"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="purchase_request_search_view">
+            <field name="name">purchase.request.search</field>
+            <field name="model">purchase.request</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Solicitudes de Compra">
+                    <field name="name" string="Referencia"/>
+                    <field name="requester_id" string="Solicitante"/>
+                    <field name="department_id" string="Departamento"/>
+                    <separator/>
+                    <filter name="my_requests" string="Mis Solicitudes" domain="[('requester_id', '=', uid)]"/>
+                    <filter name="state_draft" string="Borrador" domain="[('state', '=', 'draft')]"/>
+                    <filter name="state_to_approve" string="Pendiente de Aprobar"
+                            domain="[('state', '=', 'to_approve')]"/>
+                    <filter name="state_approved" string="Aprobado" domain="[('state', '=', 'approved')]"/>
+                    <filter name="state_rejected" string="Rechazado" domain="[('state', '=', 'rejected')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter name="group_by_state" string="Estado" context="{'group_by': 'state'}"/>
+                        <filter name="group_by_requester" string="Solicitante" context="{'group_by': 'requester_id'}"/>
+                        <filter name="group_by_department" string="Departamento"
+                                context="{'group_by': 'department_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="purchase_request_kanban_view">
+            <field name="name">purchase.request.kanban</field>
+            <field name="model">purchase.request</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state" class="o_kanban_small_header">
+                    <field name="kanban_state_color"/>
+                    <field name="activity_state"/>
+                    <field name="name"/>
+                    <field name="requester_id"/>
+                    <field name="date_needed"/>
+                    <field name="priority"/>
+                    <field name="total_amount"/>
+                    <field name="activity_ids"/>
+
+                    <progressbar field="activity_state" colors='{"planned": "success", "today": "warning", "overdue": "danger"}'/>
+
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_color_#{record.kanban_state_color.raw_value} oe_kanban_global_click">
+                                <div class="o_kanban_content">
+                                    <div>
+                                        <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                    </div>
+
+                                    <div>
+                                        <span class="fw-bold"><field name="total_amount" widget="monetary"/></span>
+                                        <span class="ms-2 text-muted"><field name="date_needed"/></span>
+                                    </div>
+
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <field name="priority" widget="priority"/>
+                                            <field name="activity_ids" widget="kanban_activity"/>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="requester_id" widget="many2one_avatar_user"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+        <record model="ir.actions.act_window" id="purchase_request_action_window">
+            <field name="name">Solicitudes de Compra</field>
+            <field name="res_model">purchase.request</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="search_view_id" ref="purchase_request_search_view"/>
+        </record>
+
+        <menuitem id="purchase_request_menu_root" name="Solicitudes de Compra" sequence="10"/>
+        <menuitem id="purchase_request_menu_main" name="Solicitudes" parent="purchase_request_menu_root"
+                  action="purchase_request_action_window"/>
+    </data>
+</odoo>
