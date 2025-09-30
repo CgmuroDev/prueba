@@ -1,0 +1,17 @@
+<odoo>
+    <data noupdate="1">
+        <record id="email_template_purchase_request_approved" model="mail.template">
+            <field name="name">Solicitud de Compra Aprobada</field>
+            <field name="model_id" ref="purchase_request.model_purchase_request"/>
+            <field name="subject">Tu Solicitud de Compra {{ object.name }} ha sido aprobada</field>
+            <field name="email_to">{{ object.requester_id.email }}</field>
+            <field name="body_html" type="html">
+                <div>
+                    Su solicitud de ausencia ha sido aprobada.<br/><br/>
+                    Atentamente,<br/>
+                </div>
+            </field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

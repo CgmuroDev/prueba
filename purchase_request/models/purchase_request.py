@@ -109,6 +109,10 @@ class PurchaseRequest(models.Model):
 
     def action_approve(self):
         self.write({'state': 'approved'})
+        self.message_post(body="Tu solicitud de compra ha sido aprobada.")
+        template = self.env.ref('purchase_request.email_template_purchase_request_approved', raise_if_not_found=False)
+        if template:
+            template.send_mail(self.id, force_send=True)
 
     def action_create_purchase_order(self):
         vendors = self.line_ids.mapped('suggested_vendor_id')

@@ -15,6 +15,7 @@
         'security/purchase_request_security.xml',
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
+        'data/mail_template_data.xml',
         'views/purchase_request_views.xml',
         'views/purchase_request_dashboard.xml',
         'wizard/rejection_wizard_views.xml',
