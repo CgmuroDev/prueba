@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <record id="purchase_request_form_view_funding_source" model="ir.ui.view">
+            <field name="name">purchase.request.form.funding.source</field>
+            <field name="model">purchase.request</field>
+            <field name="inherit_id" ref="purchase_request.purchase_request_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='line_ids']/tree/field[@name='suggested_vendor_id']" position="after">
+                    <field name="funding_source_id" options="{'no_create': True}"/>
+                    <field name="company_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="purchase_request_search_view_funding_source" model="ir.ui.view">
+            <field name="name">purchase.request.search.funding.source</field>
+            <field name="model">purchase.request</field>
+            <field name="inherit_id" ref="purchase_request.purchase_request_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search" position="inside">
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

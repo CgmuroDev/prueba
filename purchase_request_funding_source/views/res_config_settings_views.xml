@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form_inherit_purchase_request" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.purchase.request</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="purchase.res_config_settings_view_form_purchase"/>
+            <field name="arch" type="xml">
+                <xpath expr="//app[@name='purchase']" position="inside">
+                    <block title="Ajustes de Solicitudes de Compra" name="purchase_request_funding_source_settings">
+                        <setting help="Si se activa, las órdenes de compra se agruparán por proveedor Y por fuente de financiamiento.">
+                            <field name="po_group_by_funding_source"/>
+                        </setting>
+                    </block>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

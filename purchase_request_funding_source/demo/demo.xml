@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+        <record id="purchase_request_funding_source_demo_general" model="purchase.request.funding.source">
+            <field name="name">Presupuesto General</field>
+            <field name="code">GEN</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="description">Fuente de financiamiento genérica utilizada para gastos operativos.</field>
+        </record>
+    </data>
+</odoo>
