@@ -27,6 +27,7 @@
         'views/res_config_settings_views.xml',
         'views/purchase_request_views.xml',
         'views/purchase_request_source_views.xml',
+        'report/purchase_request_funding_report.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

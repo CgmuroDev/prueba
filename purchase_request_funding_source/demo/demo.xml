@@ -1,10 +1,42 @@
 <odoo>
     <data>
+        <!-- Fuentes de financiamiento con distintos presupuestos -->
         <record id="purchase_request_funding_source_demo_general" model="purchase.request.funding.source">
             <field name="name">Presupuesto General</field>
             <field name="code">GEN</field>
             <field name="company_id" ref="base.main_company"/>
-            <field name="description">Fuente de financiamiento genérica utilizada para gastos operativos.</field>
+            <field name="description">Presupuesto anual disponible: 120&nbsp;000.00 USD para operaciones generales.</field>
         </record>
+
+        <record id="purchase_request_funding_source_demo_it" model="purchase.request.funding.source">
+            <field name="name">Innovación TI</field>
+            <field name="code">IT2025</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="description">Presupuesto asignado: 80&nbsp;000.00 USD para proyectos tecnológicos estratégicos.</field>
+        </record>
+
+        <record id="purchase_request_funding_source_demo_marketing" model="purchase.request.funding.source">
+            <field name="name">Campañas Marketing</field>
+            <field name="code">MKT25</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="description">Presupuesto disponible: 45&nbsp;000.00 USD para campañas digitales.</field>
+        </record>
+
+        <!-- Configuración para agrupar órdenes por fuente -->
+        <record id="purchase_request_funding_source_demo_param" model="ir.config_parameter">
+            <field name="key">purchase_request_funding_source.po_group_by_funding_source</field>
+            <field name="value">True</field>
+        </record>
+
+        <!-- Solicitud con múltiples fuentes de financiamiento -->
+        <record id="purchase_request_funding_demo_request" model="purchase.request">
+            <field name="name">SC/DEMO-006</field>
+            <field name="requester_id" ref="purchase_request.purchase_request_demo_user_sofia"/>
+            <field name="date_needed">2025-11-15</field>
+            <field name="justification">Piloto de analítica avanzada con financiamiento mixto.</field>
+            <field name="priority">2</field>
+            <field name="state">approved</field>
+        </record>
+
     </data>
 </odoo>

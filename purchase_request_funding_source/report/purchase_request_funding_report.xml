@@ -1,0 +1,83 @@
+<odoo>
+    <data>
+        <record id="action_report_purchase_request_funding_breakdown" model="ir.actions.report">
+            <field name="name">Desglose por Fuente de Financiamiento</field>
+            <field name="model">purchase.request</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">purchase_request_funding_source.report_funding_breakdown_template</field>
+            <field name="report_file">purchase_request_funding_source.report_funding_breakdown_template</field>
+            <field name="binding_model_id" ref="purchase_request.model_purchase_request"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_funding_breakdown_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="oe_structure"/>
+                            <h2>Desglose por Fuente de Financiamiento</h2>
+                            <p class="lead">Para la Solicitud de Compra: <strong><span t-field="doc.name"/></strong></p>
+
+                            <t t-foreach="doc.line_ids.mapped('funding_source_id')" t-as="funding_source">
+                                <div class="card border-dark my-4" style="page-break-inside: avoid;">
+                                    <div class="card-header bg-dark text-white">
+                                        <h4 class="mb-0">
+                                            <t t-esc="funding_source.name or 'Sin Fuente Asignada'"/>
+                                            <small class="text-muted" t-if="funding_source.code"> (<t t-esc="funding_source.code"/>)</small>
+                                        </h4>
+                                    </div>
+                                    <div class="card-body" t-if="funding_source.description">
+                                        <p class="card-text"><em><t t-esc="funding_source.description"/></em></p>
+                                    </div>
+                                    <table class="table table-sm table-striped mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Producto/Servicio</th>
+                                                <th class="text-end">Cantidad</th>
+                                                <th class="text-end">Precio Unitario</th>
+                                                <th class="text-end">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-set="lines" t-value="doc.line_ids.filtered(lambda l: l.funding_source_id.id == funding_source.id)"/>
+                                            <tr t-foreach="lines" t-as="line">
+                                                <td><span t-field="line.product_id.display_name"/></td>
+                                                <td class="text-end"><span t-field="line.quantity"/></td>
+                                                <td class="text-end"><span t-field="line.estimated_price" t-options='{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.requester_id.company_id.currency_id}'/></td>
+                                                <td class="text-end"><span t-field="line.subtotal" t-options='{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.requester_id.company_id.currency_id}'/></td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-group-divider">
+                                                <td colspan="3" class="text-end"><strong>Total por Fuente</strong></td>
+                                                <td class="text-end">
+                                                    <strong><span t-esc="sum(lines.mapped('subtotal'))" t-options='{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.requester_id.company_id.currency_id}'/></strong>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </t>
+
+                            <div class="row justify-content-end mt-5">
+                                <div class="col-5">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <tr class="border-black bg-light">
+                                                <td><h3>Total de la Solicitud</h3></td>
+                                                <td class="text-end">
+                                                    <h3><span t-field="doc.total_amount" t-options='{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.requester_id.company_id.currency_id}'/></h3>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,114 @@
+<odoo>
+    <data>
+        <record id="action_report_purchase_request_summary" model="ir.actions.report">
+            <field name="name">Resumen de Solicitud de Compra</field>
+            <field name="model">purchase.request</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">purchase_request.report_purchase_request_summary_template</field>
+            <field name="report_file">purchase_request.report_purchase_request_summary_template</field>
+            <field name="binding_model_id" ref="model_purchase_request"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_purchase_request_summary_template">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="oe_structure"/>
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <h2>Solicitud de Compra: <span t-field="doc.name"/></h2>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <span class="badge" t-attf-class="{{
+                                        'bg-success' if doc.state == 'approved' else
+                                        'bg-warning' if doc.state == 'to_approve' else
+                                        'bg-danger' if doc.state in ['rejected', 'cancel'] else
+                                        'bg-info'
+                                    }}" t-field="doc.state"/>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-header"><h5 class="mb-0">Detalles de la Solicitud</h5></div>
+                                        <div class="card-body">
+                                            <p><strong>Solicitante:</strong> <span t-field="doc.requester_id.name"/></p>
+                                            <p><strong>Departamento:</strong> <span t-field="doc.department_id.name"/></p>
+                                            <p><strong>Fecha Requerida:</strong> <span t-field="doc.date_needed" t-options='{&quot;widget&quot;: &quot;date&quot;}'/></p>
+                                            <p><strong>Prioridad:</strong> <span t-field="doc.priority"/></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card shadow-sm mb-4">
+                                        <div class="card-header"><h5 class="mb-0">Justificación</h5></div>
+                                        <div class="card-body">
+                                            <p t-field="doc.justification"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h3 class="mt-4">Productos y Servicios Solicitados</h3>
+                            <table class="table table-sm table-bordered table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Producto/Servicio</th>
+                                        <th class="text-end">Cantidad</th>
+                                        <th class="text-end">Precio Estimado</th>
+                                        <th>Proveedor Sugerido</th>
+                                        <th class="text-end">Impuestos</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td><span t-field="line.product_id.display_name"/></td>
+                                        <td class="text-end"><span t-field="line.quantity"/></td>
+                                        <td class="text-end"><span t-field="line.estimated_price" t-options='{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.requester_id.company_id.currency_id}'/></td>
+                                        <td><span t-field="line.suggested_vendor_id.name"/></td>
+                                        <td class="text-end"><span t-esc="', '.join(map(lambda x: x.name, line.taxes_id))"/></td>
+                                        <td class="text-end"><span t-field="line.subtotal" t-options='{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.requester_id.company_id.currency_id}'/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row justify-content-end mt-4">
+                                <div class="col-4">
+                                    <table class="table table-sm">
+                                        <tbody>
+                                            <tr class="border-black">
+                                                <td><h4>Total General</h4></td>
+                                                <td class="text-end">
+                                                    <h4><span t-field="doc.total_amount" t-options='{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.requester_id.company_id.currency_id}'/></h4>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="row mt-5" style="page-break-inside: avoid;">
+                                <div class="col-6">
+                                    <strong>Aprobado por:</strong>
+                                    <hr/>
+                                    <p>Nombre:</p>
+                                    <p>Fecha:</p>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Recibido por:</strong>
+                                    <hr/>
+                                    <p>Nombre:</p>
+                                    <p>Fecha:</p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

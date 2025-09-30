@@ -1,30 +1,186 @@
 <odoo>
     <data>
-<!--
-          <record id="object0" model="purchase_request.purchase_request">
-            <field name="name">Object 0</field>
-            <field name="value">0</field>
-          </record>
+        <!-- Departamentos -->
+        <record id="purchase_request_demo_department_it" model="hr.department">
+            <field name="name">Tecnologías de la Información</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
 
-          <record id="object1" model="purchase_request.purchase_request">
-            <field name="name">Object 1</field>
-            <field name="value">10</field>
-          </record>
+        <record id="purchase_request_demo_department_operations" model="hr.department">
+            <field name="name">Operaciones</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
 
-          <record id="object2" model="purchase_request.purchase_request">
-            <field name="name">Object 2</field>
-            <field name="value">20</field>
-          </record>
+        <!-- Usuarios -->
+        <record id="purchase_request_demo_user_ana" model="res.users">
+            <field name="name">Ana Ramírez</field>
+            <field name="login">ana.pr</field>
+            <field name="password">demo</field>
+            <field name="email">ana.ramirez@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('purchase_request.group_purchase_request_user')])]"/>
+        </record>
 
-          <record id="object3" model="purchase_request.purchase_request">
-            <field name="name">Object 3</field>
-            <field name="value">30</field>
-          </record>
+        <record id="purchase_request_demo_user_carlos" model="res.users">
+            <field name="name">Carlos Díaz</field>
+            <field name="login">carlos.pr</field>
+            <field name="password">demo</field>
+            <field name="email">carlos.diaz@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('purchase_request.group_purchase_request_user')])]"/>
+        </record>
 
-          <record id="object4" model="purchase_request.purchase_request">
-            <field name="name">Object 4</field>
-            <field name="value">40</field>
-          </record>
--->
+        <record id="purchase_request_demo_user_lucia" model="res.users">
+            <field name="name">Lucía Torres</field>
+            <field name="login">lucia.pr</field>
+            <field name="password">demo</field>
+            <field name="email">lucia.torres@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('purchase_request.group_purchase_request_viewer')])]"/>
+        </record>
+
+        <record id="purchase_request_demo_user_sofia" model="res.users">
+            <field name="name">Sofía Méndez</field>
+            <field name="login">sofia.pr</field>
+            <field name="password">demo</field>
+            <field name="email">sofia.mendez@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+            <field name="groups_id" eval="[(6, 0, [ref('purchase_request.group_purchase_request_manager')])]"/>
+        </record>
+
+        <!-- Empleados -->
+        <record id="purchase_request_demo_employee_ana" model="hr.employee">
+            <field name="name">Ana Ramírez</field>
+            <field name="user_id" ref="purchase_request_demo_user_ana"/>
+            <field name="department_id" ref="purchase_request_demo_department_it"/>
+            <field name="work_email">ana.ramirez@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="purchase_request_demo_employee_carlos" model="hr.employee">
+            <field name="name">Carlos Díaz</field>
+            <field name="user_id" ref="purchase_request_demo_user_carlos"/>
+            <field name="department_id" ref="purchase_request_demo_department_operations"/>
+            <field name="work_email">carlos.diaz@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="purchase_request_demo_employee_lucia" model="hr.employee">
+            <field name="name">Lucía Torres</field>
+            <field name="user_id" ref="purchase_request_demo_user_lucia"/>
+            <field name="department_id" ref="purchase_request_demo_department_it"/>
+            <field name="work_email">lucia.torres@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="purchase_request_demo_employee_sofia" model="hr.employee">
+            <field name="name">Sofía Méndez</field>
+            <field name="user_id" ref="purchase_request_demo_user_sofia"/>
+            <field name="department_id" ref="purchase_request_demo_department_operations"/>
+            <field name="work_email">sofia.mendez@example.com</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Proveedores -->
+        <record id="purchase_request_demo_vendor_tech" model="res.partner">
+            <field name="name">Proveedor TechMaster</field>
+            <field name="supplier_rank">1</field>
+            <field name="company_type">company</field>
+            <field name="phone">+52 55 1000 2000</field>
+            <field name="email">contacto@techmaster.com</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="purchase_request_demo_vendor_office" model="res.partner">
+            <field name="name">Soluciones Oficina</field>
+            <field name="supplier_rank">1</field>
+            <field name="company_type">company</field>
+            <field name="phone">+52 55 2000 3000</field>
+            <field name="email">ventas@solucionesoficina.com</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Productos -->
+        <record id="purchase_request_product_template_laptop" model="product.template">
+            <field name="name">Laptop Ultrabook</field>
+            <field name="type">consu</field>
+            <field name="standard_price">1200.0</field>
+            <field name="list_price">1500.0</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="purchase_ok">True</field>
+        </record>
+
+        <record id="purchase_request_product_template_monitor" model="product.template">
+            <field name="name">Monitor 27" UHD</field>
+            <field name="type">consu</field>
+            <field name="standard_price">350.0</field>
+            <field name="list_price">450.0</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="purchase_ok">True</field>
+        </record>
+
+        <record id="purchase_request_product_template_chair" model="product.template">
+            <field name="name">Silla Ergonómica</field>
+            <field name="type">consu</field>
+            <field name="standard_price">280.0</field>
+            <field name="list_price">360.0</field>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="uom_po_id" ref="uom.product_uom_unit"/>
+            <field name="purchase_ok">True</field>
+        </record>
+
+        <!-- Solicitudes de compra -->
+        <record id="purchase_request_demo_sc_draft" model="purchase.request">
+            <field name="name">SC/DEMO-001</field>
+            <field name="requester_id" ref="purchase_request_demo_user_ana"/>
+            <field name="date_needed">2025-10-15</field>
+            <field name="justification">Equipo necesario para nuevo desarrollador.</field>
+            <field name="priority">1</field>
+            <field name="state">draft</field>
+        </record>
+
+        <record id="purchase_request_demo_sc_to_approve" model="purchase.request">
+            <field name="name">SC/DEMO-002</field>
+            <field name="requester_id" ref="purchase_request_demo_user_carlos"/>
+            <field name="date_needed">2025-10-20</field>
+            <field name="justification">Compra de mobiliario para área de soporte.</field>
+            <field name="priority">2</field>
+            <field name="state">to_approve</field>
+        </record>
+
+        <record id="purchase_request_demo_sc_approved" model="purchase.request">
+            <field name="name">SC/DEMO-003</field>
+            <field name="requester_id" ref="purchase_request_demo_user_ana"/>
+            <field name="date_needed">2025-10-25</field>
+            <field name="justification">Renovación de monitores para equipo de diseño.</field>
+            <field name="priority">3</field>
+            <field name="state">approved</field>
+        </record>
+
+        <record id="purchase_request_demo_sc_po_created" model="purchase.request">
+            <field name="name">SC/DEMO-004</field>
+            <field name="requester_id" ref="purchase_request_demo_user_carlos"/>
+            <field name="date_needed">2025-11-05</field>
+            <field name="justification">Adquisición de equipo mixto para laboratorio QA.</field>
+            <field name="priority">1</field>
+            <field name="state">po_created</field>
+        </record>
+
+        <record id="purchase_request_demo_sc_rejected" model="purchase.request">
+            <field name="name">SC/DEMO-005</field>
+            <field name="requester_id" ref="purchase_request_demo_user_ana"/>
+            <field name="date_needed">2025-09-30</field>
+            <field name="justification">Reemplazo de mobiliario no urgente.</field>
+            <field name="priority">0</field>
+            <field name="state">rejected</field>
+            <field name="rejection_reason">Presupuesto agotado para el trimestre.</field>
+        </record>
+
     </data>
 </odoo>
