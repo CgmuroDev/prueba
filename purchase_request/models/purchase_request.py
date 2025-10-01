@@ -69,13 +69,28 @@ class PurchaseRequest(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', 'Nuevo') == 'Nuevo':
-            company_id = vals.get('company_id') or self.env.company.id
-            vals['name'] = self.env['ir.sequence'].with_context(force_company=company_id).next_by_code('purchase.request.sequence') or 'Nuevo'
+            company_id = vals.get('company_id', self.env.company.id)
+
+            sequence = self.env['ir.sequence'].search([
+                ('code', '=', 'purchase.request.sequence'),
+                ('company_id', '=', company_id)
+            ], limit=1)
+
+            if not sequence:
+                sequence = self.env['ir.sequence'].sudo().create({
+                    'name': f'Secuencia de Folios - Solicitud de Compra - Compañía {company_id}',
+                    'code': 'purchase.request.sequence',
+                    'prefix': f'PR/{company_id}/%(year)s/',
+                    'padding': 5,
+                    'company_id': company_id,
+                })
+
+            vals['name'] = sequence.next_by_id()
 
         request = super(PurchaseRequest, self).create(vals)
         if request.requester_id:
             request.message_subscribe(partner_ids=[request.requester_id.partner_id.id])
-        
+
         return request
 
 
@@ -175,6 +190,10 @@ class PurchaseRequest(models.Model):
         self.write({'state': 'cancel'})
 
     def action_reset_to_draft(self):
+        for request in self:
+            if request.purchase_order_ids:
+                request.purchase_order_ids.button_cancel()
+                request.purchase_order_ids.unlink()
         self.write({'state': 'draft'})
 
     def action_view_purchase_orders(self):
@@ -223,10 +242,22 @@ class PurchaseRequestLine(models.Model):
         'account.tax',
         string='Impuestos',
         store=True,
-        readonly=True,
+        readonly=False,
         check_company=True)
 
-    @api.depends('quantity', 'estimated_price', 'product_id', 'taxes_id')
+    @api.onchange('product_id', 'company_id')
+    def _onchange_product_id_taxes(self):
+        if self.product_id:
+            taxes = self.product_id.supplier_taxes_id.filtered(
+                lambda t: t.company_id == self.company_id
+            )
+            self.taxes_id = taxes
+            self.estimated_price = self.product_id.standard_price
+        else:
+            self.taxes_id = False
+            self.estimated_price = 0.0
+
+    @api.depends('quantity', 'estimated_price', 'product_id', 'taxes_id', 'company_id')
     def _compute_subtotal(self):
         for line in self:
             price = line.estimated_price
@@ -242,7 +273,7 @@ class PurchaseRequestLine(models.Model):
 
             line.subtotal = taxes['total_included'] if taxes else qty * price
 
-    @api.depends('product_id')
+    @api.depends('product_id', 'company_id')
     def _compute_estimated_price(self):
         for line in self:
             if line.product_id:

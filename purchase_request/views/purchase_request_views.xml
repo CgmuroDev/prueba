@@ -52,12 +52,12 @@
                         <button name="action_cancel"
                                 string="Cancelar"
                                 type="object"
-                                invisible="state == 'cancel' or state in ['rejected', 'po_created']"/>
+                                invisible="state in ['cancel', 'rejected', 'po_created']"/>
 
                         <button name="action_reset_to_draft"
                                 string="Restablecer a Borrador"
                                 type="object"
-                                invisible="not (state in ['cancel', 'rejected'])"/>
+                                invisible="state not in ['cancel', 'rejected', 'po_created']"/>
 
 
                         <field name="state" widget="statusbar"
@@ -79,18 +79,18 @@
                         </div>
                         <group>
                             <group>
-                                <field name="requester_id"/>
-                                <field name="department_id"/>
-                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                                <field name="requester_id" readonly="state == 'po_created'"/>
+                                <field name="department_id" readonly="state == 'po_created'"/>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" readonly="state == 'po_created'"/>
                             </group>
                             <group>
-                                <field name="date_needed"/>
-                                <field name="priority" widget="priority"/>
+                                <field name="date_needed" readonly="state == 'po_created'"/>
+                                <field name="priority" widget="priority" readonly="state == 'po_created'"/>
                             </group>
                         </group>
                         <notebook>
                             <page string="Productos/Servicios">
-                                <field name="line_ids">
+                                <field name="line_ids" readonly="state == 'po_created'">
                                     <tree editable="bottom">
                                         <field name="company_id" column_invisible="1"/>
                                         <field name="product_id"/>
@@ -103,7 +103,7 @@
                                 </field>
                             </page>
                             <page string="Justificación">
-                                <field name="justification"/>
+                                <field name="justification" readonly="state == 'po_created'"/>
                             </page>
                         </notebook>
                     </sheet>
