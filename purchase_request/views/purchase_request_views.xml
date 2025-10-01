@@ -10,6 +10,7 @@
                       decoration-info="state == 'draft'">
                     <field name="name"/>
                     <field name="requester_id"/>
+                    <field name="company_id" groups="base.group_multi_company" optional="show"/>
                     <field name="date_needed"/>
                     <field name="state" widget="badge"/>
                     <field name="priority" widget="priority"/>
@@ -80,6 +81,7 @@
                             <group>
                                 <field name="requester_id"/>
                                 <field name="department_id"/>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                             </group>
                             <group>
                                 <field name="date_needed"/>
@@ -121,6 +123,7 @@
                     <field name="name" string="Referencia"/>
                     <field name="requester_id" string="Solicitante"/>
                     <field name="department_id" string="Departamento"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
                     <separator/>
                     <filter name="my_requests" string="Mis Solicitudes" domain="[('requester_id', '=', uid)]"/>
                     <filter name="state_draft" string="Borrador" domain="[('state', '=', 'draft')]"/>
@@ -133,6 +136,7 @@
                         <filter name="group_by_requester" string="Solicitante" context="{'group_by': 'requester_id'}"/>
                         <filter name="group_by_department" string="Departamento"
                                 context="{'group_by': 'department_id'}"/>
+                        <filter name="group_by_company" string="Compañía" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
                     </group>
                 </search>
             </field>

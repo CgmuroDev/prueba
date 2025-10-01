@@ -13,6 +13,15 @@ class PurchaseRequest(models.Model):
         string='Folio', required=True, copy=False, readonly=True,
         index=True, default=lambda self: _('New'))
 
+    company_id = fields.Many2one(
+        'res.company',
+        string='Compañía',
+        required=True,
+        index=True,
+        default=lambda self: self.env.company,
+        tracking=True,
+    )
+
     requester_id = fields.Many2one(
         'res.users', string='Solicitante', required=True,
         default=lambda self: self.env.user, tracking=True)
@@ -93,9 +102,12 @@ class PurchaseRequest(models.Model):
 
     def action_submit_for_approval(self):
         self.write({'state': 'to_approve'})
+        try:
+            approver_group = self.env.ref('purchase_request.group_purchase_request_manager')
+            self.message_subscribe(partner_ids=approver_group.users.partner_id.ids)
+        except ValueError:
+            raise UserError(_("No se ha encontrado el grupo de aprobadores de solicitud de compra."))
 
-        approver_group = self.env.ref('purchase_request.group_purchase_request_manager')
-        self.message_subscribe(partner_ids=approver_group.users.partner_id.ids)
 
         for user in approver_group.users:
             self.activity_schedule(

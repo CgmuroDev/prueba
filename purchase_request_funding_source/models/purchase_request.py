@@ -6,14 +6,6 @@ from odoo.exceptions import UserError
 class PurchaseRequest(models.Model):
     _inherit = 'purchase.request'
 
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Compañía',
-        required=True,
-        index=True,
-        default=lambda self: self.env.company,
-    )
-
     def action_create_purchase_order(self):
         vendors = self.line_ids.mapped('suggested_vendor_id')
         if not vendors:
