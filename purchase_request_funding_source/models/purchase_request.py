@@ -52,13 +52,6 @@ class PurchaseRequest(models.Model):
 class PurchaseRequestLine(models.Model):
     _inherit = 'purchase.request.line'
 
-    company_id = fields.Many2one(
-        string='Compañía',
-        comodel_name='res.company',
-        related='funding_source_id.company_id',
-        store=True,
-        readonly=True,
-    )
     funding_source_id = fields.Many2one(
         comodel_name='purchase.request.funding.source',
         string='Fuente de Financiamiento',

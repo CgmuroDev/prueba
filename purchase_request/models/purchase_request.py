@@ -9,9 +9,7 @@ class PurchaseRequest(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'priority desc,date_needed desc ,id desc'
 
-    name = fields.Char(
-        string='Folio', required=True, copy=False, readonly=True,
-        index=True, default=lambda self: _('New'))
+    name = fields.Char(string='Folio', required=True, readonly=True, default='Nuevo', copy=False)
 
     company_id = fields.Many2one(
         'res.company',
@@ -64,15 +62,21 @@ class PurchaseRequest(models.Model):
 
     kanban_state_color = fields.Integer(string='Color de Estado Kanban', compute='_compute_kanban_state_color')
 
+    _sql_constraints = [
+        ('name_company_uniq', 'unique(name, company_id)', 'El folio debe ser único por compañía!')
+    ]
 
     @api.model
     def create(self, vals):
+        if vals.get('name', 'Nuevo') == 'Nuevo':
+            company_id = vals.get('company_id') or self.env.company.id
+            vals['name'] = self.env['ir.sequence'].with_context(force_company=company_id).next_by_code('purchase.request.sequence') or 'Nuevo'
+
         request = super(PurchaseRequest, self).create(vals)
         if request.requester_id:
             request.message_subscribe(partner_ids=[request.requester_id.partner_id.id])
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('purchase.request') or _('New')
-        return super(PurchaseRequest, self).create(vals)
+        
+        return request
 
 
     @api.depends('purchase_order_ids')
@@ -191,7 +195,8 @@ class PurchaseRequestLine(models.Model):
         'purchase.request', string='Solicitud de Compra', ondelete='cascade')
 
     product_id = fields.Many2one(
-        'product.product', string='Producto/Servicio', required=True)
+        'product.product', string='Producto/Servicio', required=True,
+        check_company=True)
 
     quantity = fields.Float(string='Cantidad', required=True, default=1.0)
 
@@ -202,9 +207,24 @@ class PurchaseRequestLine(models.Model):
         string='Subtotal (impuestos incluidos)', compute='_compute_subtotal', store=True)
 
     suggested_vendor_id = fields.Many2one(
-        'res.partner', string='Proveedor Sugerido')
+        'res.partner', string='Proveedor Sugerido',
+        check_company=True)
 
-    taxes_id = fields.Many2many('account.tax', string='Impuestos', related='product_id.taxes_id', readonly=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string='Compañía',
+        related='request_id.company_id',
+        store=True,
+        readonly=True,
+        index=True,
+    )
+
+    taxes_id = fields.Many2many(
+        'account.tax',
+        string='Impuestos',
+        store=True,
+        readonly=True,
+        check_company=True)
 
     @api.depends('quantity', 'estimated_price', 'product_id', 'taxes_id')
     def _compute_subtotal(self):

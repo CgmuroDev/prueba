@@ -92,10 +92,11 @@
                             <page string="Productos/Servicios">
                                 <field name="line_ids">
                                     <tree editable="bottom">
+                                        <field name="company_id" column_invisible="1"/>
                                         <field name="product_id"/>
                                         <field name="quantity"/>
                                         <field name="estimated_price"/>
-                                        <field name="suggested_vendor_id" required="1"/>
+                                        <field name="suggested_vendor_id" required="1" domain="[('supplier_rank', '>', 0)]"/>
                                         <field name="taxes_id" widget="many2many_tags"/>
                                         <field name="subtotal" sum="total"/>
                                     </tree>
