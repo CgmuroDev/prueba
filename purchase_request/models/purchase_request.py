@@ -66,6 +66,12 @@ class PurchaseRequest(models.Model):
         ('name_company_uniq', 'unique(name, company_id)', 'El folio debe ser único por compañía!')
     ]
 
+    @api.onchange('company_id')
+    def _onchange_company_id(self):
+        if self.company_id:
+            if self.line_ids:
+                self.line_ids = [(5, 0, 0)]
+
     @api.model
     def create(self, vals):
         if vals.get('name', 'Nuevo') == 'Nuevo':
